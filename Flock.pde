@@ -15,6 +15,12 @@ class Flock {
     }
   }
   
+  public void draw(ToxiclibsSupport gfx, boolean debug) {
+    for (Diamond d : diamonds) {
+      d.draw(gfx, debug);
+    }
+  }
+  
   /**
    * Add a new Diamond to the flock.
    *

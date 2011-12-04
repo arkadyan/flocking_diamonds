@@ -4,7 +4,8 @@ private static final int WORLD_WIDTH = 680;
 private static final int WORLD_HEIGHT = 480;
 
 private static final color BACKGROUND_COLOR = #999999;
-private static final int FLOCK_SIZE = 100;
+/*private static final int FLOCK_SIZE = 100;*/
+private static final int FLOCK_SIZE = 1;
 
 // Whether or not to display extra visuals for debugging.
 private boolean debug = false;
