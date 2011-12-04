@@ -12,7 +12,7 @@ class Diamond extends Mover {
   private static final float ALIGNING_FORCE_WEIGHT = 0.2;
   private static final float COHESION_FORCE_WEIGHT = 0.2;
   
-  private static final float DESIRED_SEPARATION = 25.0;
+  private static final float DESIRED_SEPARATION = 30.0;
   private static final float NEIGHBOR_DISTANCE = 50;
   
   private Polygon2D shape;
@@ -87,18 +87,20 @@ class Diamond extends Mover {
   private void flock(ArrayList<Diamond> diamonds) {
     Vec2D separationForce = determineSeparationForce(diamonds);
     Vec2D aligningForce = determineAligningForce(diamonds);
-/*    Vec2D cohesionForce = determineCohesionForce(diamonds);*/
+    Vec2D cohesionForce = determineCohesionForce(diamonds);
     
     // Weight these forces.
     separationForce.scaleSelf(SEPARATION_FORCE_WEIGHT);
     println("separationForce=" + separationForce);
     aligningForce.scaleSelf(ALIGNING_FORCE_WEIGHT);
-/*    cohesionForce.scaleSelf(COHESION_FORCE_WEIGHT);*/
+    println("aligningForce=" + aligningForce);
+    cohesionForce.scaleSelf(COHESION_FORCE_WEIGHT);
+    println("cohesionForce=" + cohesionForce);
     
     // Add the force vectors to our acceleration
     applyForce(separationForce);
     applyForce(aligningForce);
-/*    applyForce(cohesionForce);*/
+    applyForce(cohesionForce);
   }
   
   /**
@@ -160,6 +162,33 @@ class Diamond extends Mover {
     }
     
     return algnForce;
+  }
+  
+  /**
+   * Steer towards the average position of all nearby diamonds.
+   */
+  private Vec2D determineCohesionForce(ArrayList<Diamond> diamonds) {
+    Vec2D cohForce = new Vec2D(0, 0);
+    int count = 0;
+    
+    for (Diamond other : diamonds) {
+      Vec2D otherPosition = other.getPosition();
+      float distance = position.distanceTo(otherPosition);
+      if (distance > 0 && distance < NEIGHBOR_DISTANCE) {
+        cohForce.addSelf(otherPosition);
+        count++;
+      }
+    }
+    
+    if (count > 0) {
+      cohForce.scaleSelf(1/count);
+      cohForce.normalize();
+      cohForce.scaleSelf(maxSpeed);
+      cohForce.subSelf(velocity);
+      cohForce.limit(maxForce);
+    }
+    
+    return cohForce;
   }
   
   /**
