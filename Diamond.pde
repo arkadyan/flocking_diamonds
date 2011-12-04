@@ -16,7 +16,7 @@ class Diamond extends Mover {
     position = pos;
     fillColor = color(random(256), random(256), random(256), random(0, 120));
     velocity = new Vec2D(random(-1, 1), random(-1, 1));
-    acceleration = new Vec2D(0, 0,);
+    acceleration = new Vec2D(0, 0);
     maxSpeed = 3;
     maxForce = 0.05;
   }
@@ -53,6 +53,8 @@ class Diamond extends Mover {
     rotate(theta);
     
     gfx.polygon2D(shape);
+    
+    if (debug) drawDebugVisuals(gfx);
   }
   
   
@@ -64,6 +66,17 @@ class Diamond extends Mover {
     if (position.y < -LENGTH) position.y = height + LENGTH;
     if (position.x > (width+LENGTH)) position.x = -LENGTH;
     if (position.y > (height+LENGTH)) position.y = -LENGTH;
+  }
+  
+  /**
+   * Draw extra visuals useful for debugging purposes.
+   */
+  private void drawDebugVisuals(ToxiclibsSupport gfx) {
+    // Draw the diamond's velocity
+    stroke(#ff00ff);
+    strokeWeight(1);
+    fill(#ff00ff);
+    Arrow.draw(gfx, position, position.add(velocity.scale(50)), 4);
   }
   
 }
