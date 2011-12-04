@@ -3,8 +3,8 @@ import toxi.processing.*;
 private static final int WORLD_WIDTH = 680;
 private static final int WORLD_HEIGHT = 480;
 
-private static final color BACKGROUND_COLOR = #999999;
-private static final int FLOCK_SIZE = 100;
+private static final color BACKGROUND_COLOR = #000000;
+private static final int FLOCK_SIZE = 200;
 
 // Whether or not to display extra visuals for debugging.
 private boolean debug = false;
@@ -27,7 +27,7 @@ void setup() {
   
   // Add an initial set of diamonds into the flock.
   for (int i=0; i < FLOCK_SIZE; i++) {
-    flock.addDiamond( new Diamond(new Vec2D(width*0.5, height*0.5)) );
+    flock.addDiamond( new Diamond(new Vec2D(width*0.5+random(-50, 50), height*0.5+random(-50, 50))) );
   }
 }
 
