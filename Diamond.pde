@@ -14,7 +14,7 @@ class Diamond extends Mover {
   
   Diamond(Vec2D pos) {
     position = pos;
-    fillColor = color(random(256), random(256), random(256), random(0, 120));
+    fillColor = color(random(256), random(256), random(256), random(150, 256));
     velocity = new Vec2D(random(-1, 1), random(-1, 1));
     acceleration = new Vec2D(0, 0);
     maxSpeed = 3;
@@ -38,6 +38,14 @@ class Diamond extends Mover {
     // Draw a diamond rotated in the direction of velocity.
     float theta = velocity.heading() + PI*0.5;
     
+    stroke(STROKE_COLOR);
+    strokeWeight(STROKE_WEIGHT);
+    fill(fillColor);
+    
+    pushMatrix();
+    translate(position.x, position.y);
+    rotate(theta);
+    
     // Define the shape.
     shape = new Polygon2D();
     shape.add(new Vec2D(0, +0.5*LENGTH));  // Top
@@ -45,14 +53,8 @@ class Diamond extends Mover {
     shape.add(new Vec2D(0, -0.5*LENGTH));  // Bottom
     shape.add(new Vec2D(-0.5*WIDTH, 0));  // Left
     
-    stroke(STROKE_COLOR);
-    strokeWeight(STROKE_WEIGHT);
-    fill(fillColor);
-    
-    translate(position.x, position.y);
-    rotate(theta);
-    
     gfx.polygon2D(shape);
+    popMatrix();
     
     if (debug) drawDebugVisuals(gfx);
   }
@@ -72,6 +74,11 @@ class Diamond extends Mover {
    * Draw extra visuals useful for debugging purposes.
    */
   private void drawDebugVisuals(ToxiclibsSupport gfx) {
+    // Draw the diamond's position
+    noStroke();
+    fill(#ff0000);
+    gfx.ellipse(new Ellipse(position, 5));
+    
     // Draw the diamond's velocity
     stroke(#ff00ff);
     strokeWeight(1);
