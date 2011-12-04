@@ -8,11 +8,12 @@ class Diamond extends Mover {
   private static final int LENGTH = 50;
   private static final int WIDTH = 30;
   
-  private static final float SEPARATION_FORCE_WEIGHT = 1.5;
-  private static final float ALIGNING_FORCE_WEIGHT = 1.0;
-  private static final float COHESION_FORCE_WEIGHT = 1.0;
+  private static final float SEPARATION_FORCE_WEIGHT = 1.0;
+  private static final float ALIGNING_FORCE_WEIGHT = 0.2;
+  private static final float COHESION_FORCE_WEIGHT = 0.2;
   
   private static final float DESIRED_SEPARATION = 25.0;
+  private static final float NEIGHBOR_DISTANCE = 50;
   
   private Polygon2D shape;
   private color fillColor;
@@ -72,23 +73,31 @@ class Diamond extends Mover {
     return position;
   }
   
+  /**
+   * Get the diamond's velocity.
+   */
+  public Vec2D getVelocity() {
+    return velocity;
+  }
+  
   
   /**
    * Figure out a new acceleration based on three rules.
    */
   private void flock(ArrayList<Diamond> diamonds) {
     Vec2D separationForce = determineSeparationForce(diamonds);
-/*    Vec2D aligningForce = determineAligningForce(diamonds);*/
+    Vec2D aligningForce = determineAligningForce(diamonds);
 /*    Vec2D cohesionForce = determineCohesionForce(diamonds);*/
     
     // Weight these forces.
     separationForce.scaleSelf(SEPARATION_FORCE_WEIGHT);
-/*    aligningForce.scaleSelf(ALIGNING_FORCE_WEIGHT);*/
+    println("separationForce=" + separationForce);
+    aligningForce.scaleSelf(ALIGNING_FORCE_WEIGHT);
 /*    cohesionForce.scaleSelf(COHESION_FORCE_WEIGHT);*/
     
     // Add the force vectors to our acceleration
     applyForce(separationForce);
-/*    applyForce(aligningForce);*/
+    applyForce(aligningForce);
 /*    applyForce(cohesionForce);*/
   }
   
@@ -96,7 +105,7 @@ class Diamond extends Mover {
    * Check for nearby diamonds and separate from them.
    */
   private Vec2D determineSeparationForce(ArrayList<Diamond> diamonds) {
-    Vec2D steeringForce = new Vec2D(0, 0);
+    Vec2D sepForce = new Vec2D(0, 0);
     int count = 0;
     
     // For every diamond in the flock, check if it's too close.
@@ -108,23 +117,49 @@ class Diamond extends Mover {
         Vec2D diff = position.sub(otherPosition);
         diff.normalize();
         diff.scaleSelf(1/distance);   // Weight by distance.
-        steeringForce.addSelf(diff);
+        sepForce.addSelf(diff);
         count++;   // Keep track of how many close neighbors.
       }
     }
     // Average -- divide by the number of close neighbors.
     if (count > 0) {
-      steeringForce.scaleSelf(1/count);
+      sepForce.scaleSelf(1/count);
     }
     
-    if (steeringForce.magnitude() > 0) {
-      steeringForce.normalize();
-      steeringForce.scaleSelf(maxSpeed);
-      steeringForce.subSelf(velocity);
-      steeringForce.limit(maxForce);
+    if (sepForce.magnitude() > 0) {
+      sepForce.normalize();
+      sepForce.scaleSelf(maxSpeed);
+      sepForce.subSelf(velocity);
+      sepForce.limit(maxForce);
     }
 
-    return steeringForce;
+    return sepForce;
+  }
+  
+  /**
+   * Align velocity with the average of the nearby diamonds.
+   */
+  private Vec2D determineAligningForce(ArrayList<Diamond> diamonds) {
+    Vec2D algnForce = new Vec2D(0, 0);
+    int count = 0;
+    
+    for (Diamond other : diamonds) {
+      float distance = position.distanceTo(other.getPosition());
+      if (distance > 0 && distance < NEIGHBOR_DISTANCE) {
+        algnForce.addSelf(other.getVelocity());
+        count++;
+      }
+    }
+    
+    if (count > 0) {
+      algnForce.scaleSelf(1/count);
+      algnForce.normalize();
+      algnForce.scaleSelf(maxSpeed);
+      algnForce.subSelf(velocity);
+      algnForce.limit(maxForce);
+    }
+    
+    return algnForce;
   }
   
   /**
