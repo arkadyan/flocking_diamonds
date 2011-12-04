@@ -8,6 +8,12 @@ class Diamond extends Mover {
   private static final int LENGTH = 50;
   private static final int WIDTH = 30;
   
+  private static final float SEPARATION_FORCE_WEIGHT = 1.5;
+  private static final float ALIGNING_FORCE_WEIGHT = 1.0;
+  private static final float COHESION_FORCE_WEIGHT = 1.0;
+  
+  private static final float DESIRED_SEPARATION = 25.0;
+  
   private Polygon2D shape;
   private color fillColor;
   
@@ -23,7 +29,7 @@ class Diamond extends Mover {
   
   
   public void run(ArrayList<Diamond> diamonds) {
-/*    flock(diamonds);*/
+    flock(diamonds);
     update();
     wrapAroundBorders();
   }
@@ -59,6 +65,67 @@ class Diamond extends Mover {
     if (debug) drawDebugVisuals(gfx);
   }
   
+  /**
+   * Get the diamond's position.
+   */
+  public Vec2D getPosition() {
+    return position;
+  }
+  
+  
+  /**
+   * Figure out a new acceleration based on three rules.
+   */
+  private void flock(ArrayList<Diamond> diamonds) {
+    Vec2D separationForce = determineSeparationForce(diamonds);
+/*    Vec2D aligningForce = determineAligningForce(diamonds);*/
+/*    Vec2D cohesionForce = determineCohesionForce(diamonds);*/
+    
+    // Weight these forces.
+    separationForce.scaleSelf(SEPARATION_FORCE_WEIGHT);
+/*    aligningForce.scaleSelf(ALIGNING_FORCE_WEIGHT);*/
+/*    cohesionForce.scaleSelf(COHESION_FORCE_WEIGHT);*/
+    
+    // Add the force vectors to our acceleration
+    applyForce(separationForce);
+/*    applyForce(aligningForce);*/
+/*    applyForce(cohesionForce);*/
+  }
+  
+  /**
+   * Check for nearby diamonds and separate from them.
+   */
+  private Vec2D determineSeparationForce(ArrayList<Diamond> diamonds) {
+    Vec2D steeringForce = new Vec2D(0, 0);
+    int count = 0;
+    
+    // For every diamond in the flock, check if it's too close.
+    for (Diamond other : diamonds) {
+      Vec2D otherPosition = other.getPosition();
+      float distance = position.distanceTo(otherPosition);
+      if (distance > 0 && distance < DESIRED_SEPARATION) {
+        // Calculate vector pointing away from the other.
+        Vec2D diff = position.sub(otherPosition);
+        diff.normalize();
+        diff.scaleSelf(1/distance);   // Weight by distance.
+        steeringForce.addSelf(diff);
+        count++;   // Keep track of how many close neighbors.
+      }
+    }
+    // Average -- divide by the number of close neighbors.
+    if (count > 0) {
+      steeringForce.scaleSelf(1/count);
+    }
+    
+    if (steeringForce.magnitude() > 0) {
+      steeringForce.normalize();
+      steeringForce.scaleSelf(maxSpeed);
+      steeringForce.subSelf(velocity);
+      steeringForce.limit(maxForce);
+    }
+
+    return steeringForce;
+  }
   
   /**
    * Make all borders wrap-around so we return to the other side of the canvas.
