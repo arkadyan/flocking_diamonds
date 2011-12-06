@@ -1,3 +1,5 @@
+import toxi.processing.*;
+
 /**
  * Manages a collection of flocking Diamonds.
  */

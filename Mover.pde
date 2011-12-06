@@ -1,9 +1,9 @@
+import toxi.geom.*;
+
 /**
  * Representation of an entity that lives in this world and moves.
  */
 abstract class Mover {
-  
-  import toxi.geom.*;
   
   protected Vec2D position;   // Our current position.
   protected Vec2D velocity;   // Our current vector velocity.

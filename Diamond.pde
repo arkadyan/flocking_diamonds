@@ -1,7 +1,7 @@
+import toxi.geom.*;
+import toxi.processing.*;
+
 class Diamond extends Mover {
-  
-  import toxi.geom.*;
-  import toxi.processing.*;
   
   private static final int LENGTH = 50;
   private static final int WIDTH = 30;
@@ -16,13 +16,19 @@ class Diamond extends Mover {
   private Polygon2D shape;
   private color fillColor;
   
+  private int worldWidth;
+  private int worldHeight;
+  
   // Properties shown while debugging
   private Vec2D separationForce;   // Force wanting to separate from all other diamonds
   private Vec2D aligningForce;   // Force wanting to align with the same direction of all nearby diamonds
   private Vec2D cohesionForce;   // Force wanting to stay between all nearby diamonds
   
-  Diamond(Vec2D pos) {
+  
+  Diamond(Vec2D pos, int ww, int wh) {
     position = pos;
+    worldWidth = ww;
+    worldHeight = wh;
     fillColor = color(random(256), random(256), random(256), random(150, 256));
     velocity = new Vec2D(random(-maxSpeed, maxSpeed), random(-maxSpeed, maxSpeed));
     acceleration = new Vec2D(0, 0);
@@ -137,8 +143,7 @@ class Diamond extends Mover {
     Vec2D algnForce = new Vec2D(0, 0);
     
     for (Diamond other : diamonds) {
-      float distance = position.distanceTo(other.getPosition());
-      if (distance > 0 && distance < NEIGHBOR_DISTANCE) {
+      if (isCloseTo(other)) {
         algnForce.addSelf(other.getVelocity());
       }
     }
@@ -160,10 +165,8 @@ class Diamond extends Mover {
     Vec2D cohForce = new Vec2D(0, 0);
     
     for (Diamond other : diamonds) {
-      Vec2D otherPosition = other.getPosition();
-      float distance = position.distanceTo(otherPosition);
-      if (distance > 0 && distance < NEIGHBOR_DISTANCE) {
-        cohForce.addSelf(otherPosition);
+      if (isCloseTo(other)) {
+        cohForce.addSelf(other.getPosition());
       }
     }
     
@@ -178,13 +181,63 @@ class Diamond extends Mover {
   }
   
   /**
+   * Check whether the distance between us and another Diamond,
+   * including wrap-around-borders, is closer than NEIGHBOR_DISTANCE.
+   * 
+   * @param other  The other Diamond to compare ourselves with.
+   */
+  private boolean isCloseTo(Diamond other) {
+    Vec2D otherPosition = other.getPosition().copy();
+    float distance = position.distanceTo(otherPosition);
+    
+    // If the distance is 0, it's most likely us and we should bail.
+    if (distance == 0) {
+      return false;
+    }
+    
+    // Nearby without wrapping borders is the easy case.
+    if (distance < NEIGHBOR_DISTANCE) {
+      return true;
+    }
+    
+    // Get a revised distance taking into account border wrapping.
+    if (position.x > worldWidth-NEIGHBOR_DISTANCE && otherPosition.x < NEIGHBOR_DISTANCE) {
+      // If we are close to the right edge and the other is close to the left,
+      // move them as if they are over to the right.
+      otherPosition.addSelf(new Vec2D(worldWidth, 0));
+    } else if (position.x < NEIGHBOR_DISTANCE && otherPosition.x > worldWidth-NEIGHBOR_DISTANCE) {
+      // If we are close to the left edge and the other is close to the right,
+      // move them as if they are over to the left.
+      otherPosition.subSelf(new Vec2D(worldWidth, 0));
+    }
+    if (position.y > worldHeight-NEIGHBOR_DISTANCE && otherPosition.y < NEIGHBOR_DISTANCE) {
+      // If we are close to the bottom edge and the other is close to the top,
+      // move them as if they are below us.
+      otherPosition.addSelf(new Vec2D(0, worldHeight));
+    } else if (position.y > worldHeight-NEIGHBOR_DISTANCE && otherPosition.y < NEIGHBOR_DISTANCE) {
+      // If we are close to the top edge and the other is close to the bottom,
+      // move them as if they are above us.
+      otherPosition.subSelf(new Vec2D(0, worldHeight));
+    }
+    
+    // Compare the distance again.
+    distance = position.distanceTo(otherPosition);
+    
+    if (distance < NEIGHBOR_DISTANCE) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  
+  /**
    * Make all borders wrap-around so we return to the other side of the canvas.
    */
   private void wrapAroundBorders() {
-    if (position.x < -LENGTH) position.x = width + LENGTH;
-    if (position.y < -LENGTH) position.y = height + LENGTH;
-    if (position.x > (width+LENGTH)) position.x = -LENGTH;
-    if (position.y > (height+LENGTH)) position.y = -LENGTH;
+    if (position.x < -LENGTH) position.x = worldWidth + LENGTH;
+    if (position.y < -LENGTH) position.y = worldHeight + LENGTH;
+    if (position.x > (worldWidth+LENGTH)) position.x = -LENGTH;
+    if (position.y > (worldHeight+LENGTH)) position.y = -LENGTH;
   }
   
   /**

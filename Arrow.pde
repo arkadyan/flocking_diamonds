@@ -1,11 +1,10 @@
+import toxi.geom.*;
+import toxi.processing.*;
+
 /**
  * Utility class for drawing arrows.
  */
 static class Arrow {
-
-  import toxi.geom.*;
-  import toxi.processing.*;
-
   
   /**
    * Draw an arrow from point "from" to point "to".
