@@ -214,7 +214,7 @@ class Diamond extends Mover {
       // If we are close to the bottom edge and the other is close to the top,
       // move them as if they are below us.
       otherPosition.addSelf(new Vec2D(0, worldHeight));
-    } else if (position.y > worldHeight-NEIGHBOR_DISTANCE && otherPosition.y < NEIGHBOR_DISTANCE) {
+    } else if (position.y < NEIGHBOR_DISTANCE && otherPosition.y > worldHeight-NEIGHBOR_DISTANCE) {
       // If we are close to the top edge and the other is close to the bottom,
       // move them as if they are above us.
       otherPosition.subSelf(new Vec2D(0, worldHeight));
