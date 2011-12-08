@@ -2,7 +2,7 @@ import processing.video.*;
 import toxi.processing.*;
 
 
-private static final int WORLD_WIDTH = 720;
+private static final int WORLD_WIDTH = 680;
 private static final int WORLD_HEIGHT = 480;
 
 private static final color BACKGROUND_COLOR = #000000;
@@ -24,7 +24,7 @@ Flock flock;
 
 
 void setup() {
-  size(720, 480);
+  size(680, 480);
 /*  size(1920, 1355);*/
   smooth();
   noCursor();
