@@ -244,11 +244,6 @@ class Diamond extends Mover {
    * Draw extra visuals useful for debugging purposes.
    */
   private void drawDebugVisuals(ToxiclibsSupport gfx) {
-    // Draw the diamond's position
-    noStroke();
-    fill(#ff0000);
-    gfx.ellipse(new Ellipse(position, 5));
-    
     // Draw the diamond's velocity
     stroke(#ff00ff);
     strokeWeight(1);
