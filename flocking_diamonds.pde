@@ -41,7 +41,7 @@ void setup() {
   
   // Add an initial set of diamonds into the flock.
   for (int i=0; i < FLOCK_SIZE; i++) {
-    flock.addDiamond( new Diamond(new Vec2D(width*0.5+random(-50, 50), height*0.5+random(-50, 50)), WORLD_WIDTH, WORLD_HEIGHT) );
+    flock.addDiamond( new Diamond(new Vec2D(random(0, width), random(0, height)), WORLD_WIDTH, WORLD_HEIGHT) );
   }
 }
 
