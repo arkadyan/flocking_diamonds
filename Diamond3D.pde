@@ -38,7 +38,7 @@ class Diamond3D extends Mover3D {
 	}
 	
 	
-	public void run(ArrayList<Diamond> diamonds) {
+	public void run(ArrayList<Diamond3D> diamonds) {
 		flock(diamonds);
 		update();
 		wrapAroundBorders();
@@ -52,7 +52,7 @@ class Diamond3D extends Mover3D {
 	 */
 	public void draw(ToxiclibsSupport gfx, boolean debug) {
 		// Draw a diamond rotated in the direction of velocity.
-		float theta = velocity.heading() + PI*0.5;
+		float theta = velocity.headingXY() + PI*0.5;
 		
 		noStroke();
 		fill(fillColor);
@@ -63,10 +63,10 @@ class Diamond3D extends Mover3D {
 		
 		// Define the shape.
 		shape = new Polygon2D();
-		shape.add(new Vec3D(0, +0.5*LENGTH));  // Top
-		shape.add(new Vec3D(+0.5*WIDTH, 0));  // Right
-		shape.add(new Vec3D(0, -0.5*LENGTH));  // Bottom
-		shape.add(new Vec3D(-0.5*WIDTH, 0));  // Left
+		shape.add(new Vec2D(0, +0.5*LENGTH));  // Top
+		shape.add(new Vec2D(+0.5*WIDTH, 0));  // Right
+		shape.add(new Vec2D(0, -0.5*LENGTH));  // Bottom
+		shape.add(new Vec2D(-0.5*WIDTH, 0));  // Left
 		
 		gfx.polygon2D(shape);
 		popMatrix();
@@ -92,7 +92,7 @@ class Diamond3D extends Mover3D {
 	/**
 	 * Figure out a new acceleration based on three rules.
 	 */
-	private void flock(ArrayList<Diamond> diamonds) {
+	private void flock(ArrayList<Diamond3D> diamonds) {
 		separationForce = determineSeparationForce(diamonds);
 		aligningForce = determineAligningForce(diamonds);
 		cohesionForce = determineCohesionForce(diamonds);
@@ -111,11 +111,11 @@ class Diamond3D extends Mover3D {
 	/**
 	 * Check for nearby diamonds and separate from them.
 	 */
-	private Vec3D determineSeparationForce(ArrayList<Diamond> diamonds) {
-		Vec3D sepForce = new Vec3D(0, 0);
+	private Vec3D determineSeparationForce(ArrayList<Diamond3D> diamonds) {
+		Vec3D sepForce = new Vec3D(0, 0, 0);
 		
 		// For every diamond in the flock, check if it's too close.
-		for (Diamond other : diamonds) {
+		for (Diamond3D other : diamonds) {
 			Vec3D otherPosition = other.getPosition();
 			float distance = position.distanceTo(otherPosition);
 			if (distance > 0 && distance < DESIRED_SEPARATION) {
@@ -140,10 +140,10 @@ class Diamond3D extends Mover3D {
 	/**
 	 * Align velocity with the average of the nearby diamonds.
 	 */
-	private Vec3D determineAligningForce(ArrayList<Diamond> diamonds) {
-		Vec3D algnForce = new Vec3D(0, 0);
+	private Vec3D determineAligningForce(ArrayList<Diamond3D> diamonds) {
+		Vec3D algnForce = new Vec3D(0, 0, 0);
 		
-		for (Diamond other : diamonds) {
+		for (Diamond3D other : diamonds) {
 			if (isCloseTo(other)) {
 				algnForce.addSelf(other.getVelocity());
 			}
@@ -162,10 +162,10 @@ class Diamond3D extends Mover3D {
   /**
    * Steer towards the average position of all nearby diamonds.
    */
-  private Vec3D determineCohesionForce(ArrayList<Diamond> diamonds) {
-    Vec3D cohForce = new Vec3D(0, 0);
+  private Vec3D determineCohesionForce(ArrayList<Diamond3D> diamonds) {
+    Vec3D cohForce = new Vec3D(0, 0, 0);
     
-    for (Diamond other : diamonds) {
+    for (Diamond3D other : diamonds) {
       if (isCloseTo(other)) {
         cohForce.addSelf(other.getPosition());
       }
@@ -187,7 +187,7 @@ class Diamond3D extends Mover3D {
    * 
    * @param other  The other Diamond to compare ourselves with.
    */
-  private boolean isCloseTo(Diamond other) {
+  private boolean isCloseTo(Diamond3D other) {
     Vec3D otherPosition = other.getPosition().copy();
     float distance = position.distanceTo(otherPosition);
     
@@ -205,20 +205,20 @@ class Diamond3D extends Mover3D {
     if (position.x > worldWidth-NEIGHBOR_DISTANCE && otherPosition.x < NEIGHBOR_DISTANCE) {
       // If we are close to the right edge and the other is close to the left,
       // move them as if they are over to the right.
-      otherPosition.addSelf(new Vec3D(worldWidth, 0));
+      otherPosition.addSelf(new Vec3D(worldWidth, 0, 0));
     } else if (position.x < NEIGHBOR_DISTANCE && otherPosition.x > worldWidth-NEIGHBOR_DISTANCE) {
       // If we are close to the left edge and the other is close to the right,
       // move them as if they are over to the left.
-      otherPosition.subSelf(new Vec3D(worldWidth, 0));
+      otherPosition.subSelf(new Vec3D(worldWidth, 0, 0));
     }
     if (position.y > worldHeight-NEIGHBOR_DISTANCE && otherPosition.y < NEIGHBOR_DISTANCE) {
       // If we are close to the bottom edge and the other is close to the top,
       // move them as if they are below us.
-      otherPosition.addSelf(new Vec3D(0, worldHeight));
+      otherPosition.addSelf(new Vec3D(0, worldHeight, 0));
     } else if (position.y < NEIGHBOR_DISTANCE && otherPosition.y > worldHeight-NEIGHBOR_DISTANCE) {
       // If we are close to the top edge and the other is close to the bottom,
       // move them as if they are above us.
-      otherPosition.subSelf(new Vec3D(0, worldHeight));
+      otherPosition.subSelf(new Vec3D(0, worldHeight, 0));
     }
     
     // Compare the distance again.
@@ -249,22 +249,22 @@ class Diamond3D extends Mover3D {
     stroke(#ff00ff);
     strokeWeight(1);
     fill(#ff00ff);
-    Arrow.draw(gfx, position, position.add(velocity.scale(10)), 4);
+    Arrow.draw(gfx, position.to2DXY(), position.to2DXY().add(velocity.to2DXY().scale(10)), 4);
     
     // Draw the separation force in green
     stroke(#97FF14);
     noFill();
-    Arrow.draw(gfx, position, position.add(separationForce.scale(500)), 4);
+    Arrow.draw(gfx, position.to2DXY(), position.to2DXY().add(separationForce.to2DXY().scale(500)), 4);
     
     // Draw the aligning force in blue
     stroke(#52C7FF);
     noFill();
-    Arrow.draw(gfx, position, position.add(aligningForce.scale(1000)), 4);
+    Arrow.draw(gfx, position.to2DXY(), position.to2DXY().add(aligningForce.to2DXY().scale(1000)), 4);
     
     // Draw the cohesion force in pink
     stroke(#FF5EDE);
     noFill();
-    Arrow.draw(gfx, position, position.add(cohesionForce.scale(1000)), 4);
+    Arrow.draw(gfx, position.to2DXY(), position.to2DXY().add(cohesionForce.to2DXY().scale(1000)), 4);
   }
   
 }
