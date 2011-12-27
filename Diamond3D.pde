@@ -1,7 +1,7 @@
 import toxi.geom.*;
 import toxi.processing.*;
 
-class Diamond3D extends Mover {
+class Diamond3D extends Mover3D {
 	
 	private static final int LENGTH = 50;
 	private static final int WIDTH = 30;
@@ -31,8 +31,8 @@ class Diamond3D extends Mover {
 		worldWidth = ww;
 		worldHeight = wh;
 		fillColor = color(random(256), random(256), random(256), random(150, 256));
-		velocity = new Vec3D(random(-maxSpeed, maxSpeed), random(-maxSpeed, maxSpeed));
-		acceleration = new Vec3D(0, 0);
+		velocity = new Vec3D(random(-maxSpeed, maxSpeed), random(-maxSpeed, maxSpeed), random(-maxSpeed, maxSpeed));
+		acceleration = new Vec3D(0, 0, 0);
 		maxSpeed = 3;
 		maxForce = 0.05;
 	}
