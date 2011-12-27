@@ -2,162 +2,163 @@ import toxi.geom.*;
 import toxi.processing.*;
 
 class Diamond extends Mover {
-  
-  private static final int LENGTH = 50;
-  private static final int WIDTH = 30;
-  
-  private static final float SEPARATION_FORCE_WEIGHT = 1.5;
-  private static final float ALIGNING_FORCE_WEIGHT = 1.0;
-  private static final float COHESION_FORCE_WEIGHT = 1.0;
-  
-  private static final float DESIRED_SEPARATION = 30.0;
-  private static final float NEIGHBOR_DISTANCE = 50;
-  
-  private Polygon2D shape;
-  private color fillColor;
-  
-  private int worldWidth;
-  private int worldHeight;
-  
-  // Properties shown while debugging
-  private Vec2D separationForce;   // Force wanting to separate from all other diamonds
-  private Vec2D aligningForce;   // Force wanting to align with the same direction of all nearby diamonds
-  private Vec2D cohesionForce;   // Force wanting to stay between all nearby diamonds
-  
-  
-  Diamond(Vec2D pos, int ww, int wh) {
-    position = pos;
-    worldWidth = ww;
-    worldHeight = wh;
-    fillColor = color(random(256), random(256), random(256), random(150, 256));
-    velocity = new Vec2D(random(-maxSpeed, maxSpeed), random(-maxSpeed, maxSpeed));
-    acceleration = new Vec2D(0, 0);
-    maxSpeed = 3;
-    maxForce = 0.05;
-  }
-  
-  
-  public void run(ArrayList<Diamond> diamonds) {
-    flock(diamonds);
-    update();
-    wrapAroundBorders();
-  }
-  
-  /**
-   * Draw our diamond at its current position.
-   *
-   * @param gfx  A ToxiclibsSupport object to use for drawing.
-   * @param debug  Whether on not to draw debugging visuals.
-   */
-  public void draw(ToxiclibsSupport gfx, boolean debug) {
-    // Draw a diamond rotated in the direction of velocity.
-    float theta = velocity.heading() + PI*0.5;
-    
-    noStroke();
-    fill(fillColor);
-    
-    pushMatrix();
-    translate(position.x, position.y);
-    rotate(theta);
-    
-    // Define the shape.
-    shape = new Polygon2D();
-    shape.add(new Vec2D(0, +0.5*LENGTH));  // Top
-    shape.add(new Vec2D(+0.5*WIDTH, 0));  // Right
-    shape.add(new Vec2D(0, -0.5*LENGTH));  // Bottom
-    shape.add(new Vec2D(-0.5*WIDTH, 0));  // Left
-    
-    gfx.polygon2D(shape);
-    popMatrix();
-    
-    if (debug) drawDebugVisuals(gfx);
-  }
-  
-  /**
-   * Get the diamond's position.
-   */
-  public Vec2D getPosition() {
-    return position;
-  }
-  
-  /**
-   * Get the diamond's velocity.
-   */
-  public Vec2D getVelocity() {
-    return velocity;
-  }
-  
-  
-  /**
-   * Figure out a new acceleration based on three rules.
-   */
-  private void flock(ArrayList<Diamond> diamonds) {
-    separationForce = determineSeparationForce(diamonds);
-    aligningForce = determineAligningForce(diamonds);
-    cohesionForce = determineCohesionForce(diamonds);
-    
-    // Weight these forces.
-    separationForce.scaleSelf(SEPARATION_FORCE_WEIGHT);
-    aligningForce.scaleSelf(ALIGNING_FORCE_WEIGHT);
-    cohesionForce.scaleSelf(COHESION_FORCE_WEIGHT);
-    
-    // Add the force vectors to our acceleration
-    applyForce(separationForce);
-    applyForce(aligningForce);
-    applyForce(cohesionForce);
-  }
-  
-  /**
-   * Check for nearby diamonds and separate from them.
-   */
-  private Vec2D determineSeparationForce(ArrayList<Diamond> diamonds) {
-    Vec2D sepForce = new Vec2D(0, 0);
-    
-    // For every diamond in the flock, check if it's too close.
-    for (Diamond other : diamonds) {
-      Vec2D otherPosition = other.getPosition();
-      float distance = position.distanceTo(otherPosition);
-      if (distance > 0 && distance < DESIRED_SEPARATION) {
-        // Calculate vector pointing away from the other.
-        Vec2D diff = position.sub(otherPosition);
-        diff.normalize();
-        diff.scaleSelf(1/distance);   // Weight by distance.
-        sepForce.addSelf(diff);
-      }
-    }
-    
-    if (sepForce.magnitude() > 0) {
-      sepForce.normalize();
-      sepForce.scaleSelf(maxSpeed);
-      sepForce.subSelf(velocity);
-      sepForce.limit(maxForce);
-    }
-
-    return sepForce;
-  }
-  
-  /**
-   * Align velocity with the average of the nearby diamonds.
-   */
-  private Vec2D determineAligningForce(ArrayList<Diamond> diamonds) {
-    Vec2D algnForce = new Vec2D(0, 0);
-    
-    for (Diamond other : diamonds) {
-      if (isCloseTo(other)) {
-        algnForce.addSelf(other.getVelocity());
-      }
-    }
-    
-    if (algnForce.magnitude() > 0) {
-      algnForce.normalize();
-      algnForce.scaleSelf(maxSpeed);
-      algnForce.subSelf(velocity);
-      algnForce.limit(maxForce);
-    }
-    
-    return algnForce;
-  }
-  
+	
+	private static final int LENGTH = 50;
+	private static final int WIDTH = 30;
+	
+	private static final float SEPARATION_FORCE_WEIGHT = 1.5;
+	private static final float ALIGNING_FORCE_WEIGHT = 1.0;
+	private static final float COHESION_FORCE_WEIGHT = 1.0;
+	
+	private static final float DESIRED_SEPARATION = 30.0;
+	private static final float NEIGHBOR_DISTANCE = 50;
+	
+	private Polygon2D shape;
+	private color fillColor;
+	
+	// Size of the world.
+	private int worldWidth;
+	private int worldHeight;
+	
+	// Properties shown while debugging
+	private Vec2D separationForce;   // Force wanting to separate from all other diamonds
+	private Vec2D aligningForce;   // Force wanting to align with the same direction of all nearby diamonds
+	private Vec2D cohesionForce;   // Force wanting to stay between all nearby diamonds
+	
+	
+	Diamond(Vec2D pos, int ww, int wh) {
+		position = pos;
+		worldWidth = ww;
+		worldHeight = wh;
+		fillColor = color(random(256), random(256), random(256), random(150, 256));
+		velocity = new Vec2D(random(-maxSpeed, maxSpeed), random(-maxSpeed, maxSpeed));
+		acceleration = new Vec2D(0, 0);
+		maxSpeed = 3;
+		maxForce = 0.05;
+	}
+	
+	
+	public void run(ArrayList<Diamond> diamonds) {
+		flock(diamonds);
+		update();
+		wrapAroundBorders();
+	}
+	
+	/**
+	 * Draw our diamond at its current position.
+	 *
+	 * @param gfx  A ToxiclibsSupport object to use for drawing.
+	 * @param debug  Whether on not to draw debugging visuals.
+	 */
+	public void draw(ToxiclibsSupport gfx, boolean debug) {
+		// Draw a diamond rotated in the direction of velocity.
+		float theta = velocity.heading() + PI*0.5;
+		
+		noStroke();
+		fill(fillColor);
+		
+		pushMatrix();
+		translate(position.x, position.y);
+		rotate(theta);
+		
+		// Define the shape.
+		shape = new Polygon2D();
+		shape.add(new Vec2D(0, +0.5*LENGTH));  // Top
+		shape.add(new Vec2D(+0.5*WIDTH, 0));  // Right
+		shape.add(new Vec2D(0, -0.5*LENGTH));  // Bottom
+		shape.add(new Vec2D(-0.5*WIDTH, 0));  // Left
+		
+		gfx.polygon2D(shape);
+		popMatrix();
+		
+		if (debug) drawDebugVisuals(gfx);
+	}
+	
+	/**
+	 * Get the diamond's position.
+	 */
+	public Vec2D getPosition() {
+		return position;
+	}
+	
+	/**
+	 * Get the diamond's velocity.
+	 */
+	public Vec2D getVelocity() {
+		return velocity;
+	}
+	
+	
+	/**
+	 * Figure out a new acceleration based on three rules.
+	 */
+	private void flock(ArrayList<Diamond> diamonds) {
+		separationForce = determineSeparationForce(diamonds);
+		aligningForce = determineAligningForce(diamonds);
+		cohesionForce = determineCohesionForce(diamonds);
+		
+		// Weight these forces.
+		separationForce.scaleSelf(SEPARATION_FORCE_WEIGHT);
+		aligningForce.scaleSelf(ALIGNING_FORCE_WEIGHT);
+		cohesionForce.scaleSelf(COHESION_FORCE_WEIGHT);
+		
+		// Add the force vectors to our acceleration
+		applyForce(separationForce);
+		applyForce(aligningForce);
+		applyForce(cohesionForce);
+	}
+	
+	/**
+	 * Check for nearby diamonds and separate from them.
+	 */
+	private Vec2D determineSeparationForce(ArrayList<Diamond> diamonds) {
+		Vec2D sepForce = new Vec2D(0, 0);
+		
+		// For every diamond in the flock, check if it's too close.
+		for (Diamond other : diamonds) {
+			Vec2D otherPosition = other.getPosition();
+			float distance = position.distanceTo(otherPosition);
+			if (distance > 0 && distance < DESIRED_SEPARATION) {
+				// Calculate vector pointing away from the other.
+				Vec2D diff = position.sub(otherPosition);
+				diff.normalize();
+				diff.scaleSelf(1/distance);   // Weight by distance.
+				sepForce.addSelf(diff);
+			}
+		}
+		
+		if (sepForce.magnitude() > 0) {
+			sepForce.normalize();
+			sepForce.scaleSelf(maxSpeed);
+			sepForce.subSelf(velocity);
+			sepForce.limit(maxForce);
+		}
+		
+		return sepForce;
+	}
+	
+	/**
+	 * Align velocity with the average of the nearby diamonds.
+	 */
+	private Vec2D determineAligningForce(ArrayList<Diamond> diamonds) {
+		Vec2D algnForce = new Vec2D(0, 0);
+		
+		for (Diamond other : diamonds) {
+			if (isCloseTo(other)) {
+				algnForce.addSelf(other.getVelocity());
+			}
+		}
+		
+		if (algnForce.magnitude() > 0) {
+			algnForce.normalize();
+			algnForce.scaleSelf(maxSpeed);
+			algnForce.subSelf(velocity);
+			algnForce.limit(maxForce);
+		}
+		
+		return algnForce;
+	}
+	
   /**
    * Steer towards the average position of all nearby diamonds.
    */
