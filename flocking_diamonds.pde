@@ -42,7 +42,7 @@ void setup() {
 		Flock3D f = new Flock3D();
 		// Add an initial set of diamonds into the flock.
 		for (int j=0; j < FLOCK_SIZE; j++) {
-	    f.addDiamond( new Diamond3D(new Vec3D(random(0, WORLD_WIDTH), random(0, WORLD_HEIGHT), 0), WORLD_WIDTH, WORLD_HEIGHT) );
+	    f.addDiamond( new Diamond3D(new Vec3D(random(0, WORLD_WIDTH), random(0, WORLD_HEIGHT), random(-1, 1)), WORLD_WIDTH, WORLD_HEIGHT) );
 	  }
 		flocks.add(f);
 	}

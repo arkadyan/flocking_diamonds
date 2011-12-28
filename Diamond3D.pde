@@ -9,9 +9,15 @@ class Diamond3D extends Mover3D {
 	private static final float SEPARATION_FORCE_WEIGHT = 1.5;
 	private static final float ALIGNING_FORCE_WEIGHT = 1.0;
 	private static final float COHESION_FORCE_WEIGHT = 1.0;
+	private static final float Z_BOUNDARY_REPULSION_WEIGHT = 0.002;
 	
 	private static final float DESIRED_SEPARATION = 30.0;
 	private static final float NEIGHBOR_DISTANCE = 50;
+	
+	private static final float Z_SCALE_WEIGHT = 0.3;
+	private static final float Z_SCALE_OFFSET = 4.0;
+	private static final float MAX_Z = 1;
+	private static final float MIN_Z = -1;
 	
 	private Polygon2D shape;
 	private color fillColor;
@@ -24,6 +30,7 @@ class Diamond3D extends Mover3D {
 	private Vec3D separationForce;   // Force wanting to separate from all other diamonds
 	private Vec3D aligningForce;   // Force wanting to align with the same direction of all nearby diamonds
 	private Vec3D cohesionForce;   // Force wanting to stay between all nearby diamonds
+	private Vec3D zRepulsionForce;   // Force pushing away from Z boundaries
 	
 	
 	Diamond3D(Vec3D pos, int ww, int wh) {
@@ -53,6 +60,11 @@ class Diamond3D extends Mover3D {
 	public void draw(ToxiclibsSupport gfx, boolean debug) {
 		// Draw a diamond rotated in the direction of velocity.
 		float theta = velocity.headingXY() + PI*0.5;
+		float zScale;
+		
+		// Determine the amount to scale the drawing based on the 
+		// z dimension of the position.
+		zScale = (position.z()+Z_SCALE_OFFSET) * Z_SCALE_WEIGHT;
 		
 		noStroke();
 		fill(fillColor);
@@ -63,10 +75,10 @@ class Diamond3D extends Mover3D {
 		
 		// Define the shape.
 		shape = new Polygon2D();
-		shape.add(new Vec2D(0, +0.5*LENGTH));  // Top
-		shape.add(new Vec2D(+0.5*WIDTH, 0));  // Right
-		shape.add(new Vec2D(0, -0.5*LENGTH));  // Bottom
-		shape.add(new Vec2D(-0.5*WIDTH, 0));  // Left
+		shape.add(new Vec2D(0, +0.5*LENGTH*zScale));  // Top
+		shape.add(new Vec2D(+0.5*WIDTH*zScale, 0));  // Right
+		shape.add(new Vec2D(0, -0.5*LENGTH*zScale));  // Bottom
+		shape.add(new Vec2D(-0.5*WIDTH*zScale, 0));  // Left
 		
 		gfx.polygon2D(shape);
 		popMatrix();
@@ -96,16 +108,19 @@ class Diamond3D extends Mover3D {
 		separationForce = determineSeparationForce(diamonds);
 		aligningForce = determineAligningForce(diamonds);
 		cohesionForce = determineCohesionForce(diamonds);
+		zRepulsionForce = determineZRepulsionForce();
 		
 		// Weight these forces.
 		separationForce.scaleSelf(SEPARATION_FORCE_WEIGHT);
 		aligningForce.scaleSelf(ALIGNING_FORCE_WEIGHT);
 		cohesionForce.scaleSelf(COHESION_FORCE_WEIGHT);
+		zRepulsionForce.scaleSelf(Z_BOUNDARY_REPULSION_WEIGHT);
 		
 		// Add the force vectors to our acceleration
 		applyForce(separationForce);
 		applyForce(aligningForce);
 		applyForce(cohesionForce);
+		applyForce(zRepulsionForce);
 	}
 	
 	/**
@@ -180,7 +195,14 @@ class Diamond3D extends Mover3D {
     
     return cohForce;
   }
-  
+	
+	/**
+	 * Be repulsed from the Z boundaries
+	 */
+  private Vec3D determineZRepulsionForce() {
+		return new Vec3D(0, 0, -(position.z/MAX_Z));
+	}
+	
   /**
    * Check whether the distance between us and another Diamond,
    * including wrap-around-borders, is closer than NEIGHBOR_DISTANCE.
