@@ -6,7 +6,8 @@ private static final int WORLD_WIDTH = 640;
 private static final int WORLD_HEIGHT = 480;
 
 private static final color BACKGROUND_COLOR = #000000;
-private static final int FLOCK_SIZE = 200;
+private static final int NUM_FLOCKS = 3;
+private static final int FLOCK_SIZE = 50;
 
 // Whether or not to display extra visuals for debugging.
 private boolean debug = false;
@@ -19,8 +20,8 @@ private boolean makingMovie = false;
 // MovieMake object to write a movie file.
 private MovieMaker mm;
 
-// A flock of Diamonds.
-Flock flock;
+// A collection of flocks of Diamonds.
+ArrayList<Flock> flocks;
 
 
 void setup() {
@@ -36,19 +37,24 @@ void setup() {
     mm = new MovieMaker(this, width, height, "flocking_diamonds.mov", 30, MovieMaker.H263, MovieMaker.HIGH);
   }
 
-  flock = new Flock();
-  
-  // Add an initial set of diamonds into the flock.
-  for (int i=0; i < FLOCK_SIZE; i++) {
-    flock.addDiamond( new Diamond(new Vec2D(random(0, width), random(0, height)), WORLD_WIDTH, WORLD_HEIGHT) );
-  }
+	flocks = new ArrayList<Flock>();
+	for (int i=0; i < NUM_FLOCKS; i++) {
+		Flock f = new Flock();
+		// Add an initial set of diamonds into the flock.
+		for (int j=0; j < FLOCK_SIZE; j++) {
+	    f.addDiamond( new Diamond(new Vec2D(random(0, width), random(0, height)), WORLD_WIDTH, WORLD_HEIGHT) );
+	  }
+		flocks.add(f);
+	}
 }
 
 void draw() {
   background(BACKGROUND_COLOR);
   
-  flock.run();
-  flock.draw(gfx, debug);
+	for (Flock flock : flocks) {
+	  flock.run();
+	  flock.draw(gfx, debug);
+	}
 
   if (makingMovie) {
     mm.addFrame();
