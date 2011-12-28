@@ -199,7 +199,7 @@ class Diamond3D extends Mover3D {
 	 * Be repulsed from the Z boundaries
 	 */
   private Vec3D determineZRepulsionForce() {
-		return new Vec3D(0, 0, -(position.z/MAX_Z));
+		return new Vec3D(0, 0, -(position.z()/MAX_Z));
 	}
 	
   /**
