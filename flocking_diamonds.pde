@@ -21,7 +21,7 @@ private boolean makingMovie = false;
 private MovieMaker mm;
 
 // A collection of flocks of Diamonds.
-ArrayList<Flock> flocks;
+ArrayList<Flock3D> flocks;
 
 
 void setup() {
@@ -37,12 +37,12 @@ void setup() {
     mm = new MovieMaker(this, width, height, "flocking_diamonds.mov", 30, MovieMaker.H263, MovieMaker.HIGH);
   }
 
-	flocks = new ArrayList<Flock>();
+	flocks = new ArrayList<Flock3D>();
 	for (int i=0; i < NUM_FLOCKS; i++) {
-		Flock f = new Flock();
+		Flock3D f = new Flock3D();
 		// Add an initial set of diamonds into the flock.
 		for (int j=0; j < FLOCK_SIZE; j++) {
-	    f.addDiamond( new Diamond(new Vec2D(random(0, width), random(0, height)), WORLD_WIDTH, WORLD_HEIGHT) );
+	    f.addDiamond( new Diamond3D(new Vec3D(random(0, WORLD_WIDTH), random(0, WORLD_HEIGHT), 0), WORLD_WIDTH, WORLD_HEIGHT) );
 	  }
 		flocks.add(f);
 	}
@@ -51,7 +51,7 @@ void setup() {
 void draw() {
   background(BACKGROUND_COLOR);
   
-	for (Flock flock : flocks) {
+	for (Flock3D flock : flocks) {
 	  flock.run();
 	  flock.draw(gfx, debug);
 	}
