@@ -17,7 +17,6 @@ class Diamond3D extends Mover3D {
 	private static final float Z_SCALE_WEIGHT = 0.3;
 	private static final float Z_SCALE_OFFSET = 4.0;
 	private static final float MAX_Z = 1;
-	private static final float MIN_Z = -1;
 	
 	private Polygon2D shape;
 	private color fillColor;
