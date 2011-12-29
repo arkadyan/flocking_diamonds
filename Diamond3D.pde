@@ -238,23 +238,19 @@ class Diamond3D extends Mover3D {
 		
 		if (position.distanceTo(otherPosition.add(new Vec3D(worldWidth, 0, 0))) < distance) {
 			// Move the other over to the right
-			// println("Moved to the RIGHT");
 			otherPosition.addSelf(new Vec3D(worldWidth, 0, 0));
 			distance = position.distanceTo(otherPosition);
 		} else if (position.distanceTo(otherPosition.sub(new Vec3D(worldWidth, 0, 0))) < distance) {
 			// Move the other over to the left
-			// println("Moved to the LEFT");
 			otherPosition.subSelf(new Vec3D(worldWidth, 0, 0));
 			distance = position.distanceTo(otherPosition);
 		}
 		if (position.distanceTo(otherPosition.add(new Vec3D(0, worldHeight, 0))) < distance) {
 			// Move the other down
-			// println("Moved DOWN");
 			otherPosition.addSelf(new Vec3D(0, worldHeight, 0));
 			distance = position.distanceTo(otherPosition);
 		} else if (position.distanceTo(otherPosition.sub(new Vec3D(0, worldHeight, 0))) < distance) {
 			// Move the other up
-			// println("Moved UP");
 			otherPosition.subSelf(new Vec3D(0, worldHeight, 0));
 			distance = position.distanceTo(otherPosition);
 		}
