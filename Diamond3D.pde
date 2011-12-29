@@ -130,7 +130,7 @@ class Diamond3D extends Mover3D {
 		
 		// For every diamond in the flock, check if it's too close.
 		for (Diamond3D other : diamonds) {
-			Vec3D otherPosition = other.getPosition();
+			Vec3D otherPosition = closestWrappedOtherPosition(other);
 			float distance = position.distanceTo(otherPosition);
 			if (distance > 0 && distance < DESIRED_SEPARATION) {
 				// Calculate vector pointing away from the other.
@@ -181,7 +181,7 @@ class Diamond3D extends Mover3D {
     
     for (Diamond3D other : diamonds) {
       if (isCloseTo(other)) {
-        cohForce.addSelf(other.getPosition());
+        cohForce.addSelf(closestWrappedOtherPosition(other));
       }
     }
     
