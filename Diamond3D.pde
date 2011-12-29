@@ -262,10 +262,10 @@ class Diamond3D extends Mover3D {
    * Make all borders wrap-around so we return to the other side of the canvas.
    */
   private void wrapAroundBorders() {
-    if (position.x < -LENGTH) position.x = worldWidth + LENGTH;
-    if (position.y < -LENGTH) position.y = worldHeight + LENGTH;
-    if (position.x > (worldWidth+LENGTH)) position.x = -LENGTH;
-    if (position.y > (worldHeight+LENGTH)) position.y = -LENGTH;
+    if (position.x < 0) position.x = worldWidth;
+    if (position.y < 0) position.y = worldHeight;
+    if (position.x > (worldWidth)) position.x = 0;
+    if (position.y > (worldHeight)) position.y = 0;
   }
   
   /**
