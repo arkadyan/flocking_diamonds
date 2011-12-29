@@ -9,7 +9,7 @@ class Diamond3D extends Mover3D {
 	private static final float SEPARATION_FORCE_WEIGHT = 1.5;
 	private static final float ALIGNING_FORCE_WEIGHT = 1.0;
 	private static final float COHESION_FORCE_WEIGHT = 1.0;
-	private static final float Z_BOUNDARY_REPULSION_WEIGHT = 0.004;
+	private static final float Z_BOUNDARY_REPULSION_WEIGHT = 0.003;
 	
 	private static final float DESIRED_SEPARATION = 30.0;
 	private static final float NEIGHBOR_DISTANCE = 50;
