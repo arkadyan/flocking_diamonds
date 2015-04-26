@@ -82,9 +82,9 @@ void setup() {
   size(640, 480);
   smooth();
   noCursor();
-  
+
   gfx = new ToxiclibsSupport(this);
-  
+
   // Create MovieMaker object with size, filename,
   // compression codec and quality, framerate
   if (makingMovie) {
@@ -96,18 +96,18 @@ void setup() {
 		Flock3D f = new Flock3D();
 		// Add an initial set of diamonds into the flock.
 		for (int j=0; j < FLOCK_SIZE; j++) {
-	    f.addDiamond( new Diamond3D(new Vec3D(random(0, WORLD_WIDTH), random(0, WORLD_HEIGHT), random(-1, 1)), WORLD_WIDTH, WORLD_HEIGHT, COLORS[i][floor(random(COLORS[i].length))]) );
-	  }
+      f.addDiamond( new Diamond3D(new Vec3D(random(0, WORLD_WIDTH), random(0, WORLD_HEIGHT), random(-1, 1)), WORLD_WIDTH, WORLD_HEIGHT, COLORS[i][floor(random(COLORS[i].length))]) );
+    }
 		flocks.add(f);
 	}
 }
 
 void draw() {
   background(BACKGROUND_COLOR);
-  
+
 	for (Flock3D flock : flocks) {
-	  flock.run();
-	  flock.draw(gfx, debug);
+    flock.run();
+    flock.draw(gfx, debug);
 	}
 
   if (makingMovie) {
@@ -121,7 +121,7 @@ void draw() {
  */
 void keyPressed() {
   if (key == ' ') debug = ! debug;
-  
+
   // Finish the movie if the Escape key is pressed.
   if (key == ESC) {
     if (makingMovie) {
