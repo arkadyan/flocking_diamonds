@@ -68,12 +68,6 @@ private boolean debug = false;
 
 ToxiclibsSupport gfx;
 
-// Whether or not to record a movie with this run.
-// NOTE: Be sure to quit the running sketch by pressing ESC.
-private boolean makingMovie = false;
-// MovieMake object to write a movie file.
-private MovieMaker mm;
-
 // A collection of flocks of Diamonds.
 ArrayList<Flock3D> flocks;
 
@@ -84,12 +78,6 @@ void setup() {
   noCursor();
 
   gfx = new ToxiclibsSupport(this);
-
-  // Create MovieMaker object with size, filename,
-  // compression codec and quality, framerate
-  if (makingMovie) {
-    mm = new MovieMaker(this, width, height, "flocking_diamonds.mov", 30, MovieMaker.H263, MovieMaker.HIGH);
-  }
 
 	flocks = new ArrayList<Flock3D>();
 	for (int i=0; i < NUM_FLOCKS; i++) {
@@ -109,10 +97,6 @@ void draw() {
     flock.run();
     flock.draw(gfx, debug);
 	}
-
-  if (makingMovie) {
-    mm.addFrame();
-  }
 }
 
 
@@ -124,9 +108,6 @@ void keyPressed() {
 
   // Finish the movie if the Escape key is pressed.
   if (key == ESC) {
-    if (makingMovie) {
-      mm.finish();
-    }
     exit();
   }
 }
