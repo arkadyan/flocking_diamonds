@@ -1,7 +1,7 @@
 import toxi.geom.*;
 import toxi.processing.*;
 
-class Diamond3D extends Mover3D {
+class Diamond extends Mover {
 
 	private static final int LENGTH = 50;
 	private static final int WIDTH = 30;
@@ -32,7 +32,7 @@ class Diamond3D extends Mover3D {
 	private Vec3D zRepulsionForce;   // Force pushing away from Z boundaries
 
 
-	Diamond3D(Vec3D pos, int ww, int wh, color c) {
+	Diamond(Vec3D pos, int ww, int wh, color c) {
 		position = pos;
 		worldWidth = ww;
 		worldHeight = wh;
@@ -44,7 +44,7 @@ class Diamond3D extends Mover3D {
 	}
 
 
-	public void run(ArrayList<Diamond3D> diamonds) {
+	public void run(ArrayList<Diamond> diamonds) {
 		flock(diamonds);
 		update();
 		wrapAroundBorders();
@@ -103,7 +103,7 @@ class Diamond3D extends Mover3D {
 	/**
    * Figure out a new acceleration based on three rules.
    */
-	private void flock(ArrayList<Diamond3D> diamonds) {
+	private void flock(ArrayList<Diamond> diamonds) {
 		separationForce = determineSeparationForce(diamonds);
 		aligningForce = determineAligningForce(diamonds);
 		cohesionForce = determineCohesionForce(diamonds);
@@ -125,11 +125,11 @@ class Diamond3D extends Mover3D {
 	/**
    * Check for nearby diamonds and separate from them.
    */
-	private Vec3D determineSeparationForce(ArrayList<Diamond3D> diamonds) {
+	private Vec3D determineSeparationForce(ArrayList<Diamond> diamonds) {
 		Vec3D sepForce = new Vec3D();
 
 		// For every diamond in the flock, check if it's too close.
-		for (Diamond3D other : diamonds) {
+		for (Diamond other : diamonds) {
 			Vec3D otherPosition = closestWrappedOtherPosition(other);
 			float distance = position.distanceTo(otherPosition);
 			if (distance > 0 && distance < DESIRED_SEPARATION) {
@@ -154,10 +154,10 @@ class Diamond3D extends Mover3D {
 	/**
    * Align velocity with the average of the nearby diamonds.
    */
-	private Vec3D determineAligningForce(ArrayList<Diamond3D> diamonds) {
+	private Vec3D determineAligningForce(ArrayList<Diamond> diamonds) {
 		Vec3D algnForce = new Vec3D();
 
-		for (Diamond3D other : diamonds) {
+		for (Diamond other : diamonds) {
 			if (isCloseTo(other)) {
 				algnForce.addSelf(other.getVelocity());
 			}
@@ -176,10 +176,10 @@ class Diamond3D extends Mover3D {
   /**
    * Steer towards the average position of all nearby diamonds.
    */
-  private Vec3D determineCohesionForce(ArrayList<Diamond3D> diamonds) {
+  private Vec3D determineCohesionForce(ArrayList<Diamond> diamonds) {
     Vec3D cohForce = new Vec3D();
 
-    for (Diamond3D other : diamonds) {
+    for (Diamond other : diamonds) {
       if (isCloseTo(other)) {
         cohForce.addSelf(closestWrappedOtherPosition(other));
       }
@@ -208,7 +208,7 @@ class Diamond3D extends Mover3D {
    *
    * @param other  The other Diamond to compare ourselves with.
    */
-  private boolean isCloseTo(Diamond3D other) {
+  private boolean isCloseTo(Diamond other) {
     Vec3D otherPosition = other.getPosition().copy();
     float distance = position.distanceTo(otherPosition);
 
@@ -232,7 +232,7 @@ class Diamond3D extends Mover3D {
     }
   }
 
-	private Vec3D closestWrappedOtherPosition(Diamond3D other) {
+	private Vec3D closestWrappedOtherPosition(Diamond other) {
 		Vec3D otherPosition = other.getPosition().copy();
 		float distance = position.distanceTo(otherPosition);
 

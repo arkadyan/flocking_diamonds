@@ -3,7 +3,7 @@ import toxi.geom.*;
 /**
  * Representation of an entity that lives in this world and moves.
  */
-abstract class Mover3D {
+abstract class Mover {
 
   protected Vec3D position;   // Our current position.
   protected Vec3D velocity;   // Our current vector velocity.

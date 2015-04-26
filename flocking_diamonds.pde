@@ -69,7 +69,7 @@ private boolean debug = false;
 ToxiclibsSupport gfx;
 
 // A collection of flocks of Diamonds.
-ArrayList<Flock3D> flocks;
+ArrayList<Flock> flocks;
 
 
 void setup() {
@@ -79,12 +79,12 @@ void setup() {
 
   gfx = new ToxiclibsSupport(this);
 
-	flocks = new ArrayList<Flock3D>();
+	flocks = new ArrayList<Flock>();
 	for (int i=0; i < NUM_FLOCKS; i++) {
-		Flock3D f = new Flock3D();
+		Flock f = new Flock();
 		// Add an initial set of diamonds into the flock.
 		for (int j=0; j < FLOCK_SIZE; j++) {
-      f.addDiamond( new Diamond3D(new Vec3D(random(0, WORLD_WIDTH), random(0, WORLD_HEIGHT), random(-1, 1)), WORLD_WIDTH, WORLD_HEIGHT, COLORS[i][floor(random(COLORS[i].length))]) );
+      f.addDiamond( new Diamond(new Vec3D(random(0, WORLD_WIDTH), random(0, WORLD_HEIGHT), random(-1, 1)), WORLD_WIDTH, WORLD_HEIGHT, COLORS[i][floor(random(COLORS[i].length))]) );
     }
 		flocks.add(f);
 	}
@@ -93,7 +93,7 @@ void setup() {
 void draw() {
   background(BACKGROUND_COLOR);
 
-	for (Flock3D flock : flocks) {
+	for (Flock flock : flocks) {
     flock.run();
     flock.draw(gfx, debug);
 	}
