@@ -98,6 +98,8 @@ void draw() {
     flock.run();
     flock.draw(gfx, debug);
 	}
+
+  //saveFrame("frames/screen-######.tif");
 }
 
 
