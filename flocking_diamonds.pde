@@ -2,8 +2,8 @@ import processing.video.*;
 import toxi.processing.*;
 
 
-private static final int WORLD_WIDTH = 640;
-private static final int WORLD_HEIGHT = 480;
+private static final int WORLD_WIDTH = 1920;
+private static final int WORLD_HEIGHT = 1080;
 
 private static final color BACKGROUND_COLOR = #000000;
 private static final int NUM_FLOCKS = 3;
@@ -73,7 +73,8 @@ ArrayList<Flock> flocks;
 
 
 void setup() {
-  size(640, 480);
+  size(1920, 1080);
+  frameRate(30);
   smooth();
   noCursor();
 

@@ -3,16 +3,16 @@ import toxi.processing.*;
 
 class Diamond extends Mover {
 
-	private static final int LENGTH = 50;
-	private static final int WIDTH = 30;
+	private static final int LENGTH = 150;
+	private static final int WIDTH = 90;
 
 	private static final float SEPARATION_FORCE_WEIGHT = 1.5;
 	private static final float ALIGNING_FORCE_WEIGHT = 1.0;
 	private static final float COHESION_FORCE_WEIGHT = 1.0;
 	private static final float Z_BOUNDARY_REPULSION_WEIGHT = 0.003;
 
-	private static final float DESIRED_SEPARATION = 30.0;
-	private static final float NEIGHBOR_DISTANCE = 50;
+	private static final float DESIRED_SEPARATION = 90.0;
+	private static final float NEIGHBOR_DISTANCE = 150;
 
 	private static final float Z_SCALE_WEIGHT = 0.3;
 	private static final float Z_SCALE_OFFSET = 4.0;
@@ -37,7 +37,7 @@ class Diamond extends Mover {
 		worldWidth = ww;
 		worldHeight = wh;
 		fillColor = c;
-		maxSpeed = 3;
+		maxSpeed = 9;
 		velocity = new Vec3D(random(-maxSpeed, maxSpeed), random(-maxSpeed, maxSpeed), random(-0.1*maxSpeed, 0.1*maxSpeed));
 		acceleration = new Vec3D();
 		maxForce = 0.05;
